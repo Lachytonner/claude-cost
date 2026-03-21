@@ -1,6 +1,6 @@
 # claude-cost-tracker
 
-CLI tool that reads your most recent Claude Code session and displays a cost summary.
+PTY wrapper for Claude Code that transparently proxies the TUI and displays a session cost summary on exit.
 
 ## Install
 
@@ -10,15 +10,15 @@ npm install -g claude-cost-tracker
 
 ## Usage
 
-After a Claude Code session ends, run:
+Use `claude-cost` anywhere you'd normally use `claude`. All arguments are forwarded:
 
 ```sh
 claude-cost
+claude-cost -p "explain this repo"
+claude-cost --model claude-opus-4-6
 ```
 
-It finds the most recently modified `.jsonl` session file in `~/.claude/projects/`, parses all assistant messages, and prints a cost breakdown.
-
-## Example Output
+When the session ends, a cost summary is printed automatically:
 
 ```
 ╔═══════════════════════════════════════════════════════════╗
@@ -36,26 +36,33 @@ It finds the most recently modified `.jsonl` session file in `~/.claude/projects
 ╚═══════════════════════════════════════════════════════════╝
 ```
 
-## Supported Models
+## How It Works
 
-- Claude Opus 4.6 / 4.5
-- Claude Sonnet 4.6 / 4.5
-- Claude Haiku 4.5
+1. Spawns the real `claude` binary via node-pty, forwarding all args, terminal dimensions, and resize events
+2. All stdin/stdout pass through unchanged — Claude Code's TUI works identically
+3. On exit, finds the most recently modified `.jsonl` in `~/.claude/projects/`
+4. Parses all assistant message usage objects and calculates cost
+5. Prints a formatted cost summary box
+
+## Supported Models & Pricing
+
+| Model | Input | Output | Cache Write | Cache Read |
+|-------|-------|--------|-------------|------------|
+| Claude Opus 4.6 / 4.5 | $5/M | $25/M | $1.25/M | $0.50/M |
+| Claude Sonnet 4.6 / 4.5 | $3/M | $15/M | $3.75/M | $0.30/M |
+| Claude Haiku 4.5 | $0.80/M | $4/M | $1/M | $0.08/M |
 
 Unknown models fall back to Sonnet-tier pricing.
 
-## How It Works
+## Platform Support
 
-1. Recursively scans `~/.claude/projects/` for `.jsonl` files
-2. Picks the most recently modified file (your latest session)
-3. Parses each assistant message's `usage` object for token counts
-4. Calculates cost using current Anthropic API pricing
-5. Prints a formatted summary box
+- **Windows**: Detects `claude.cmd` / `claude.exe`, uses ConPTY
+- **macOS / Linux**: Standard PTY
 
 ## Requirements
 
 - Node.js 16+
-- Claude Code (must have at least one session in `~/.claude/projects/`)
+- Claude Code installed and on PATH
 
 ## License
 

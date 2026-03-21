@@ -1,7 +1,7 @@
 {
   "name": "claude-cost-tracker",
-  "version": "1.0.0",
-  "description": "CLI tool that reads your most recent Claude Code session and displays a cost summary",
+  "version": "2.0.0",
+  "description": "PTY wrapper for Claude Code that displays session cost on exit",
   "main": "src/index.js",
   "bin": {
     "claude-cost": "src/index.js"
@@ -13,12 +13,16 @@
     "tracker",
     "cli",
     "tokens",
-    "usage"
+    "usage",
+    "pty"
   ],
   "author": "",
   "license": "MIT",
   "engines": {
     "node": ">=16"
+  },
+  "dependencies": {
+    "node-pty": "^1.0.0"
   },
   "files": [
     "src/",

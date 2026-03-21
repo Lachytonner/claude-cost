@@ -1,6 +1,6 @@
 # claude-cost-tracker
 
-A transparent wrapper around the `claude` CLI that tracks and displays your API session cost.
+CLI tool that reads your most recent Claude Code session and displays a cost summary.
 
 ## Install
 
@@ -10,32 +10,53 @@ npm install -g claude-cost-tracker
 
 ## Usage
 
-Replace `claude` with `claude-cost`. Every argument is forwarded identically:
+After a Claude Code session ends, run:
 
 ```sh
-claude-cost                    # same as: claude
-claude-cost --resume           # same as: claude --resume
-claude-cost --model sonnet     # same as: claude --model sonnet
+claude-cost
 ```
 
-## Demo
+It finds the most recently modified `.jsonl` session file in `~/.claude/projects/`, parses all assistant messages, and prints a cost breakdown.
+
+## Example Output
 
 ```
-$ claude-cost
-> Tell me a joke
-
-...Claude responds...
-
-💰 Session cost: $0.0043
+╔═══════════════════════════════════════════════════════════╗
+║  Claude Session Cost Summary                              ║
+╟───────────────────────────────────────────────────────────╢
+║  Session Cost:    $0.1234                                 ║
+║  Model:           claude-sonnet-4-6                       ║
+║  Messages:        12                                      ║
+║                                                           ║
+║  Input tokens:    5,000   ($0.0150)                       ║
+║  Output tokens:   2,000   ($0.0300)                       ║
+║  Cache read:      10,000   ($0.0030)                      ║
+║  Cache write:     3,000   ($0.0113)                       ║
+║  Total tokens:    20,000                                  ║
+╚═══════════════════════════════════════════════════════════╝
 ```
 
-The cost summary prints automatically when you exit (`/exit`, Ctrl-C, or Ctrl-D).
+## Supported Models
 
-## How it works
+- Claude Opus 4.6 / 4.5
+- Claude Sonnet 4.6 / 4.5
+- Claude Haiku 4.5
 
-`claude-cost` spawns the `claude` binary inside a pseudo-terminal (PTY) so Claude sees a real terminal and all interactive features work identically. Output is buffered line-by-line to match lines like `Cost: $0.0043`, accumulate a running total, then forwarded to your terminal unchanged. When the session ends, the total is printed and the process exits with Claude's exit code.
+Unknown models fall back to Sonnet-tier pricing.
+
+## How It Works
+
+1. Recursively scans `~/.claude/projects/` for `.jsonl` files
+2. Picks the most recently modified file (your latest session)
+3. Parses each assistant message's `usage` object for token counts
+4. Calculates cost using current Anthropic API pricing
+5. Prints a formatted summary box
 
 ## Requirements
 
-- Node.js 18+
-- `claude` CLI installed and available in `PATH`
+- Node.js 16+
+- Claude Code (must have at least one session in `~/.claude/projects/`)
+
+## License
+
+MIT

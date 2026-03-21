@@ -1,0 +1,25 @@
+{
+  "name": "claude-cost-tracker",
+  "version": "0.1.0",
+  "description": "Transparent claude CLI wrapper that tracks and displays session API cost",
+  "main": "src/index.js",
+  "bin": {
+    "claude-cost": "src/index.js"
+  },
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "keywords": ["claude", "anthropic", "cost", "cli", "wrapper"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "node-pty": "^1.0.0"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "files": [
+    "src/",
+    "README.md"
+  ]
+}
